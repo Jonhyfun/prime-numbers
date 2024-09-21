@@ -38,8 +38,6 @@ export function HomePage({
     };
   }, [cols]);
 
-  console.log({ cols });
-
   return (
     <main className="flex min-h-screen flex-col gap-10 items-center p-24 bg-white">
       <div className="flex gap-3 text-black text-xl">
@@ -51,7 +49,7 @@ export function HomePage({
       <div className="grid grid-cols-4 gap-10 w-full text-center max-w-lg">
         {cols.map((col, i) => (
           <div key={`col-${i}`} className="grid grid-cols-1 gap-7">
-            {col.slice(-1).map((possiblePrime) =>
+            {col.map((possiblePrime) =>
               simpleCheckPrime(possiblePrime) ? (
                 <TaggedNumber
                   className={`${
