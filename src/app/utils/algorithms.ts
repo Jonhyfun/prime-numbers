@@ -1,3 +1,5 @@
+//import sqrt from "bigint-isqrt";
+
 export function checkSemiprime(num: number) {
   let cnt = 0;
 
@@ -22,13 +24,15 @@ export function checkSemiprime(num: number) {
 }
 
 export function simpleCheckPrime(possiblePrime: number) {
+  //Todo Usar BigInt só quando for BigInt?
   if (possiblePrime < 1) return 0;
 
   let count = 0;
-  const sqrtN = Math.sqrt(possiblePrime);
+  const sqrtN = Math.sqrt(possiblePrime); //Todo Usar BigInt só quando for BigInt?
 
   for (let i = 1; i <= sqrtN; i++) {
     if (possiblePrime % i === 0) {
+      //Todo Usar BigInt só quando for BigInt?
       count++; // i is a divisor
       if (i !== possiblePrime / i) {
         count++; // possiblePrime / i is also a divisor if it's different from i
@@ -36,7 +40,7 @@ export function simpleCheckPrime(possiblePrime: number) {
     }
   }
 
-  if (count < 2)
+  if (count < 2 && possiblePrime !== 1)
     throw new Error(
       `⚠️ Space Time Anomaly Detected! ⚠️ \n ${possiblePrime} has ${count} multiples`
     );

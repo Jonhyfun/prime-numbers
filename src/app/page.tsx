@@ -3,27 +3,28 @@ import { HomePage } from "./HomePage";
 import { checkSemiprime } from "./utils/algorithms";
 
 const base = 12;
-const primeParents = [5, 7, 11, 13];
+const primeParents = [5];
 
 export default function Home() {
-  const generateCols = (length = (100 - 4) / 4) => {
+  const generateCols = (from = 1, to = 10000) => {
     return primeParents.map((parent) => {
-      const resultingArray = [parent];
-      for (let index = 0; index < length; index++) {
+      const resultingArray = [];
+      for (let index = from; index < to + 1; index++) {
         //TODO, calcular removendo o anterior para ser infinito (nao quebrar pelo limite de tamanho de um array)
-        const possiblePrime = resultingArray[resultingArray.length - 1] + base;
-        resultingArray.push(possiblePrime);
+        const possiblePrime = parent + 12 * (index - 1);
+        resultingArray.push({ index, possiblePrime });
       }
       return resultingArray;
     });
   };
 
-  const generateColsByLine = (line: number) => {
+  const generateColsByLine = (line = 1) => {
     return primeParents.map((parent) => {
       const resultingArray = [parent];
-      for (let index = 0; index < length; index++) {
+      for (let index = 0; index < line; index++) {
         const possiblePrime = resultingArray[resultingArray.length - 1] + base;
         resultingArray.push(possiblePrime);
+        resultingArray.shift();
       }
       return resultingArray;
     });
@@ -39,11 +40,10 @@ export default function Home() {
   cols.forEach((col) => {
     col.forEach((possiblePrime) => {
       if (
-        //possiblePrime % 5 !== 0 &&
-        possiblePrime % 7 !==
-        0 //&&
-        ///possiblePrime % 11 !== 0 &&
-        //possiblePrime % 13 !== 0
+        possiblePrime % 5 !== 0 &&
+        possiblePrime % 7 !== 0 &&
+        possiblePrime % 11 !== 0 &&
+        possiblePrime % 13 !== 0
       ) {
         primeSet.add(possiblePrime);
       }
