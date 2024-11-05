@@ -1,81 +1,36 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { TaggedNumber } from "./_components/TaggedNumber";
-import { checkPrime, simpleCheckPrime } from "./utils/algorithms";
+import { simpleCheckPrime } from "./utils/algorithms";
+import { primeParents } from "./page";
 
-function isMultipleOf11OfCol5(x: number) {
-  // 11n - 4
-  //? from 7 on, summing 11 will lead to uniquely non-primes
-  // Solve for n
-  const n = (x + 4) / 11;
-
-  // Check if n is a positive integer
-  return Number.isInteger(n) && n > 0;
-}
-
-function isMultipleOf13OfCol5(x: number) {
-  // 13n - 7
-  // Solve for n
-  const n = (x + 7) / 13;
-
-  // Check if n is a positive integer
-  return Number.isInteger(n) && n > 0;
-}
-
-function isMultipleOf17OfCol5(x: number) {
-  // 17n - 15
-  // Solve for n
-  const n = (x + 15) / 17;
-
-  // Check if n is a positive integer
-  return Number.isInteger(n) && n > 0;
-}
-
-function isMultipleOf19OfCol5(x: number) {
-  // 19n - 20
-  // Solve for n
-  const n = (x + 20) / 19;
-
-  // Check if n is a positive integer
-  return Number.isInteger(n) && n > 0;
-}
-
-function isMultipleOf23OfCol5(x: number) {
-  // 23n - 9
-  // Solve for n
-  const n = (x + 9) / 23;
-
-  // Check if n is a positive integer
-  return Number.isInteger(n) && n > 0;
-}
-
-function isMultipleOf29OfCol5(x: number) {
-  // 29n - -3
-  // Solve for n
-  const n = (x - 3) / 29;
-
-  // Check if n is a positive integer
-  return Number.isInteger(n) && n > 0;
-}
-
-function isMultipleOf33OfCol5(x: number) {
-  // 31n - 33
-  // Solve for n
-  const n = (x + 33) / 31;
-
-  // Check if n is a positive integer
-  return Number.isInteger(n) && n > 0;
-}
-
-function isMultipleOf37OfCol5(x: number) {
-  // 37n - 21
-  // Solve for n
-  const n = (x + 21) / 37;
-
-  // Check if n is a positive integer
-  return Number.isInteger(n) && n > 0;
-}
+const lineRules: Record<any, ((line: number) => boolean)[]> = {
+  1: [
+    (line: number) => (line - 3) % 5 === 0, // n = 5k + 3
+    (line: number) => (line - 5) % 7 === 0, // n = 7k + 5
+    (line: number) => line % 11 === 0, // n = 11k
+    (line: number) => (line - 2) % 13 === 0, // n = 13k + 2
+  ],
+  5: [
+    (line: number) => (line - 1) % 5 === 0, // n = 5k + 1
+    (line: number) => line % 7 === 0, // n = 7k
+    (line: number) => (line - 7) % 11 === 0, // n = 11k + 7
+    (line: number) => (line - 6) % 13 === 0, // n = 13k + 6
+  ],
+  7: [
+    (line: number) => line % 5 === 0, // n = 5k
+    (line: number) => (line - 1) % 7 === 0, // n = 7k + 1,
+    (line: number) => (line - 5) % 11 === 0, // n = 11k + 5
+    (line: number) => (line - 8) % 13 === 0, // n = 13k - 8
+  ],
+  11: [
+    (line: number) => (line - 3) % 5 === 0, // n = 5k + 3,
+    (line: number) => (line - 3) % 7 === 0, // n = 7k + 3
+    (line: number) => (line - 1) % 11 === 0, // n = 11k + 1
+    (line: number) => (line - 12) % 13 === 0, // n = 13k + 12
+  ],
+};
 
 export function HomePage({
   cols,
@@ -87,7 +42,7 @@ export function HomePage({
   const [foundPrimes, setFoundPrimes] = useState(0);
   const [totalNumbers, setTotalNumbers] = useState(0);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let primeCount = 0;
     let totalCount = 0;
     document
@@ -96,9 +51,8 @@ export function HomePage({
         const children = domCollumn.children;
         for (let child of children) {
           totalCount++;
-          const style = window.getComputedStyle(child);
-          const color = style.color;
-          if (color === "rgb(0, 0, 0)") {
+          const classList = child.classList;
+          if (!child.classList.contains("notPrime")) {
             primeCount++;
           }
         }
@@ -116,10 +70,11 @@ export function HomePage({
       <div className="flex gap-3 text-black text-xl">
         <span>Primes found:</span>
         <span>
-          {foundPrimes} in {totalNumbers} numbers
+          {foundPrimes - totalNumbers} in {totalNumbers} numbers{" "}
+          {/* //? Não faço ideia de onde veio esse bug de precisar subtrair kkkkk */}
         </span>
       </div>
-      <div className="grid grid-cols-2 gap-10 w-full text-center max-w-lg">
+      <div className="grid grid-cols-5 gap-10 w-full text-center max-w-lg">
         <div className="grid grid-cols-1 gap-7">
           {Array.from({ length: cols[0].length }).map((_, i) => (
             <a
@@ -138,7 +93,7 @@ export function HomePage({
               const line = index;
               return true ? (
                 <TaggedNumber
-                  className={`mr-auto ${
+                  className={`mx-auto ${
                     // ! (line / 100 > 1 && (line / 10) % 10 === 5) ||
                     //isMultipleOf11OfCol5(line) ||
                     //isMultipleOf13OfCol5(line) ||
@@ -148,13 +103,18 @@ export function HomePage({
                     //isMultipleOf23OfCol5(line) ||
                     //isMultipleOf33OfCol5(line) ||
                     //isMultipleOf37OfCol5(line) ||
-                    (line !== 1 && line % 10 === 1) || // ? (12 * 10x) + 5 = não primo kkkkkk
-                    line % 10 === 6 || //? (6-1) * algo = não primo kkkkkkk
-                    line % 7 === 0
-                      ? "text-[#00000040!important]"
+                    //(line !== 1 && line % 10 === 1) || // ? (12 * 10x) + 5 = não primo kkkkkk
+                    //line % 10 === 6 || //? (6-1) * algo = não primo kkkkkkk
+                    (
+                      line !== 1
+                        ? lineRules[primeParents[i]]?.some((fn) => fn(line))
+                        : false
+                    )
+                      ? //line % 7 === 0
+                        "text-[#00000040!important] notPrime"
                       : simpleCheckPrime(possiblePrime)
                       ? ""
-                      : "text-[red!important]"
+                      : "text-[red!important] notPrime"
                   }`}
                   key={`possiblePrime-${possiblePrime}`}
                   initialColor={
@@ -166,7 +126,7 @@ export function HomePage({
               ) : (
                 <div
                   key={`possiblePrime-${possiblePrime}`}
-                  className={`mr-auto text-[#00000040] text-xl font-semibold`}
+                  className={`mx-auto text-[#00000040] text-xl font-semibold`}
                 >
                   {possiblePrime}
                 </div>

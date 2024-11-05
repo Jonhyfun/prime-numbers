@@ -1,21 +1,22 @@
-import { TaggedNumber } from "./_components/TaggedNumber";
 import { HomePage } from "./HomePage";
 import { checkSemiprime } from "./utils/algorithms";
 
 const base = 12;
-const primeParents = [5];
+export const primeParents = [1, 5, 7, 11];
 
 export default function Home() {
-  const generateCols = (from = 1, to = 10000) => {
-    return primeParents.map((parent) => {
-      const resultingArray = [];
-      for (let index = from; index < to + 1; index++) {
-        //TODO, calcular removendo o anterior para ser infinito (nao quebrar pelo limite de tamanho de um array)
-        const possiblePrime = parent + 12 * (index - 1);
-        resultingArray.push({ index, possiblePrime });
-      }
-      return resultingArray;
-    });
+  const generateCol = (primeParent: number, from = -10, to = 1000) => {
+    const resultingArray = [];
+    for (let index = from; index < to + 1; index++) {
+      //TODO, calcular removendo o anterior para ser infinito (nao quebrar pelo limite de tamanho de um array)
+      const possiblePrime = primeParent + 12 * (index - 1);
+      resultingArray.push({ index, possiblePrime });
+    }
+    return resultingArray;
+  };
+
+  const generateCols = () => {
+    return primeParents.map((parent) => generateCol(parent));
   };
 
   const generateColsByLine = (line = 1) => {
@@ -38,7 +39,7 @@ export default function Home() {
   //? todo multiplo de 5 que ta aparecendo na lista, é um semi primo * 5?
   // Populate the Set with primes from cols
   cols.forEach((col) => {
-    col.forEach((possiblePrime) => {
+    col.forEach(({ possiblePrime }) => {
       if (
         possiblePrime % 5 !== 0 &&
         possiblePrime % 7 !== 0 &&
